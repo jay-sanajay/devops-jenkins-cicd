@@ -212,7 +212,7 @@ powershell.exe -ExecutionPolicy Bypass -File .\scripts\stop.ps1 -Port 5000
 git add .
 git commit -m "feat: initial commit of automated CI/CD pipeline and Flask app"
 git branch -M main
-git remote add origin https://github.com/<YOUR-GITHUB-USERNAME>/devops-jenkins-cicd.git
+git remote add origin https://github.com/jay-sanajay/devops-jenkins-cicd.git
 git push -u origin main
 ```
 
@@ -251,7 +251,7 @@ There are two straightforward ways to run Jenkins on Windows. The **Standalone W
 4. Scroll down to the **Pipeline** configuration section:
    - **Definition:** Select `Pipeline script from SCM`.
    - **SCM:** Select `Git`.
-   - **Repository URL:** Enter your GitHub repo URL: `https://github.com/<YOUR-USERNAME>/devops-jenkins-cicd.git`.
+   - **Repository URL:** Enter your GitHub repo URL: `https://github.com/jay-sanajay/devops-jenkins-cicd.git`.
    - **Credentials:** If your repo is public, leave as `none`. If private, add your GitHub Personal Access Token (PAT).
    - **Branch Specifier:** Change `*/master` to `*/main`.
    - **Script Path:** Ensure it is set to `Jenkinsfile`.
