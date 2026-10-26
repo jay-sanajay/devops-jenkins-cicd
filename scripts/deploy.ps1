@@ -65,58 +65,38 @@ try {
         }
     }
 } catch {
-    # Ignore if NetTCPConnection is restricted in current permissions
+    # Ignore if NetTCPConnection is restricted
 }
 
-# 4. Clear or Initialize Log Files
-$LogFile = "$RootDir\app.log"
-$ErrFile = "$RootDir\app.err.log"
-if (Test-Path $LogFile) { Remove-Item $LogFile -Force -ErrorAction SilentlyContinue }
-if (Test-Path $ErrFile) { Remove-Item $ErrFile -Force -ErrorAction SilentlyContinue }
-New-Item -Path $LogFile -ItemType File -Force | Out-Null
-New-Item -Path $ErrFile -ItemType File -Force | Out-Null
-
-# 5. Start the Application in Background
+# 4. Start the Application in Background
 Write-Host "[INFO] Launching app.py on ${HostAddress}:${Port} ..." -ForegroundColor Cyan
 $env:PORT = $Port.ToString()
 $env:HOST = $HostAddress
+$env:JENKINS_NODE_COOKIE = "dontKillMe"
 
 $process = Start-Process `
     -FilePath $PythonExe `
     -ArgumentList "app.py" `
     -WorkingDirectory $RootDir `
-    -RedirectStandardOutput $LogFile `
-    -RedirectStandardError $ErrFile `
+    -WindowStyle Hidden `
     -PassThru
 
 if (-not $process -or $process.HasExited) {
     Write-Error "[FATAL] Failed to start application process."
-    if (Test-Path $ErrFile) {
-        Write-Host "--- Application Error Log ---" -ForegroundColor Red
-        Get-Content $ErrFile
-    }
     exit 1
 }
 
-# 6. Save PID to app.pid
+# 5. Save PID to app.pid
 $process.Id | Out-File -FilePath $PidFile -Encoding ascii -Force
 Write-Host "[SUCCESS] Application started with PID: $($process.Id)" -ForegroundColor Green
 
-# 7. Grace Period & Readiness Check
-Write-Host "[INFO] Waiting 3 seconds for server startup..." -ForegroundColor Cyan
-Start-Sleep -Seconds 3
+# 6. Grace Period & Readiness Check
+Write-Host "[INFO] Waiting 2 seconds for server startup..." -ForegroundColor Cyan
+Start-Sleep -Seconds 2
 
 $check = Get-Process -Id $process.Id -ErrorAction SilentlyContinue
 if ($null -eq $check -or $check.HasExited) {
     Write-Error "[FATAL] Process $($process.Id) exited prematurely."
-    if (Test-Path $ErrFile) {
-        Write-Host "--- Application Error Log ---" -ForegroundColor Red
-        Get-Content $ErrFile
-    }
-    if (Test-Path $LogFile) {
-        Write-Host "--- Application Log Output ---" -ForegroundColor Red
-        Get-Content $LogFile
-    }
     exit 1
 }
 

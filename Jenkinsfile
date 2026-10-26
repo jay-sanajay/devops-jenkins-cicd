@@ -115,6 +115,7 @@ pipeline {
             steps {
                 echo '=== Stage 5: Deploying Application Locally ==='
                 powershell '''
+                    $env:JENKINS_NODE_COOKIE = "dontKillMe"
                     Write-Host "[DEPLOY] Running scripts/deploy.ps1..."
                     powershell.exe -ExecutionPolicy Bypass -File .\\scripts\\deploy.ps1 -Port $env:PORT -HostAddress $env:HOST
                 '''
