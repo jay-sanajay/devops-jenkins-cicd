@@ -131,7 +131,7 @@ pipeline {
             steps {
                 echo '=== Stage 6: Running Live Smoke Test / Health Check ==='
                 powershell '''
-                    $healthUrl = "http://${env:HOST}:${env:PORT}/health"
+                    $healthUrl = "http://" + $env:HOST + ":" + $env:PORT + "/health"
                     Write-Host "[SMOKE TEST] Querying $healthUrl ..."
 
                     $maxRetries = 5
